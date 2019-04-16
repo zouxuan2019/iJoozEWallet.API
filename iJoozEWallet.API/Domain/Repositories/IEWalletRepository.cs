@@ -6,8 +6,11 @@ namespace iJoozEWallet.API.Domain.Repositories
 {
     public interface IEWalletRepository
     {
-        Task<IEnumerable<EWallet>> ListAsync();
+        Task<IEnumerable<EWallet>> ListAllAsync();
+        void AddOrUpdateEWallet(EWallet eWallet, bool isAdd);
 
-        Task AddTopUpAsync(TopUpHistory topUpHistory);
+        Task<EWallet> FindByUserIdAsync(int userId);
+
+        Task<TopUpHistory> FindByTopUpTransactionIdAsync(string transactionId);
     }
 }

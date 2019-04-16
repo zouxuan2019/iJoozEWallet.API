@@ -1,19 +1,22 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using iJoozEWallet.API.Utils;
+using Newtonsoft.Json;
 
-namespace iJoozEWallet.API.Domain.Models
+namespace iJoozEWallet.API.Resources
 {
-    public class TopUpHistory
+    public class TopUpResource
     {
-        public int Id { get; set; }
+        [Required]
         public double Amount { get; set; }
         public string TransactionId { get; set; }
         public string PaymentReferenceNo { get; set; }
         public string PaymentMerchant { get; set; }
         public Result Result { get; set; }
+        
+        [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime ActionDate { get; set; }
 
-        public int UserId { get; set; }
-        public EWallet EWallet { get; set; }
+        [Required] public int UserId { get; set; }
     }
 }

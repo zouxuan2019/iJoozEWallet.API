@@ -8,7 +8,8 @@ namespace iJoozEWallet.API.Mapping
     {
         public ResourceToModelProfile()
         {
-            CreateMap<SaveTopUpResource, TopUpHistory>();
+            CreateMap<TopUpResource, TopUpHistory>();
+            CreateMap<DeductResource, DeductHistory>();
         }
     }
 }

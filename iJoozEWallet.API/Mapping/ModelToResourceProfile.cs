@@ -9,6 +9,7 @@ namespace iJoozEWallet.API.Mapping
         public ModelToResourceProfile()
         {
             CreateMap<EWallet, EWalletResource>();
+            CreateMap<TopUpHistory, TopUpResource>();
         }
     }
 }

@@ -1,7 +1,9 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iJoozEWallet.API", "iJoozEWallet.API\iJoozEWallet.API.csproj", "{9773A99E-5463-43C2-9335-AAF2E0A8501C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iJoozEWallet.API.Test", "iJoozEWallet.API.Test\iJoozEWallet.API.Test.csproj", "{9CF63482-B56B-4FCF-8FAD-DFA65164A988}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,5 +15,9 @@ Global
 		{9773A99E-5463-43C2-9335-AAF2E0A8501C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9773A99E-5463-43C2-9335-AAF2E0A8501C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9773A99E-5463-43C2-9335-AAF2E0A8501C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CF63482-B56B-4FCF-8FAD-DFA65164A988}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CF63482-B56B-4FCF-8FAD-DFA65164A988}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CF63482-B56B-4FCF-8FAD-DFA65164A988}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CF63482-B56B-4FCF-8FAD-DFA65164A988}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
