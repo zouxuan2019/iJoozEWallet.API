@@ -1,6 +1,8 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using iJoozEWallet.API.Domain.Repositories;
 using iJoozEWallet.API.Domain.Services;
+using iJoozEWallet.API.Persistence;
 using iJoozEWallet.API.Persistence.Contexts;
 using iJoozEWallet.API.Persistence.Repositories;
 using iJoozEWallet.API.Services;
@@ -27,11 +29,22 @@ namespace iJoozEWallet.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            CommonConfig(services);
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString(Environment.GetEnvironmentVariable("DbConnectionString"))));
+        }
+
+        public void ConfigureDevelopmentServices(IServiceCollection services)
+        {
+            CommonConfig(services);
             services.AddDbContext<AppDbContext>(options => { options.UseInMemoryDatabase("ijooz-db-in-memory"); });
-//            services.AddDbContext<AppDbContext>(options =>
-//                options.UseSqlServer(
-//                    Configuration.GetConnectionString("DefaultConnection")));
+        }
+
+
+        private static void CommonConfig(IServiceCollection services)
+        {
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddScoped<IEWalletRepository, EWalletRepository>();
             services.AddScoped<IEWalletService, EWalletService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();

@@ -16,13 +16,17 @@ namespace iJoozEWallet.API
     {
         public static void Main(string[] args)
         {
-
             var host = BuildWebHost(args);
-           //below for in memory database
-            using (var scope = host.Services.CreateScope())
-            using (var context = scope.ServiceProvider.GetService<AppDbContext>())
+            
+            //below for in memory database
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (environment == EnvironmentName.Development)
             {
-                context.Database.EnsureCreated();
+                using (var scope = host.Services.CreateScope())
+                using (var context = scope.ServiceProvider.GetService<AppDbContext>())
+                {
+                    context.Database.EnsureCreated();
+                }
             }
 
             host.Run();
