@@ -48,8 +48,8 @@ namespace iJoozEWallet.API.Persistence.Contexts
 
             builder.Entity<EWallet>().HasData
             (
-                new EWallet {UserId = 100, Balance = 100, LastUpdateDate = DateTime.Now},
-                new EWallet {UserId = 101, Balance = 10, LastUpdateDate = DateTime.Now}
+                new EWallet {UserId = "100", Balance = 100, LastUpdateDate = DateTime.Now},
+                new EWallet {UserId = "101", Balance = 10, LastUpdateDate = DateTime.Now}
             );
         }
 

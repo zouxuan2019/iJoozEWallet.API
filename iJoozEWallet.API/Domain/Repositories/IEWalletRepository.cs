@@ -9,7 +9,7 @@ namespace iJoozEWallet.API.Domain.Repositories
         Task<IEnumerable<EWallet>> ListAllAsync();
         void AddOrUpdateEWallet(EWallet eWallet, bool isAdd);
 
-        Task<EWallet> FindByUserIdAsync(int userId);
+        Task<EWallet> FindByUserIdAsync(string userId);
 
         Task<TopUpHistory> FindByTopUpTransactionIdAsync(string transactionId);
     }

@@ -29,14 +29,14 @@ namespace iJoozEWallet.API.Test.Services
 
         public EWallet EWallet = new EWallet
         {
-            UserId = 200,
+            UserId = "200",
             Balance = 100,
             LastUpdateDate = DateTime.Parse("2019-01-01"),
             DeductHistories = new List<DeductHistory>
             {
                 new DeductHistory
                 {
-                    Id = 1, UserId = 200, ActionDate = DateTime.Parse("2019-01-01"),
+                    Id = 1, UserId = "200", ActionDate = DateTime.Parse("2019-01-01"),
                     Result = Result.Success,
                     Amount = 100, TransactionId = "feedDeductTransactionId"
                 }
@@ -45,7 +45,7 @@ namespace iJoozEWallet.API.Test.Services
             {
                 new TopUpHistory
                 {
-                    Id = 1, UserId = 200, ActionDate = DateTime.Parse("2019-01-01"),
+                    Id = 1, UserId = "200", ActionDate = DateTime.Parse("2019-01-01"),
                     Result = Result.Success,
                     Amount = 100, TransactionId = "feedTopUpTransactionId"
                 }

@@ -5,7 +5,7 @@ namespace iJoozEWallet.API.Domain.Models
 {
     public class EWallet
     {
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public double Balance { get; set; }
 
         public DateTime LastUpdateDate { get; set; }

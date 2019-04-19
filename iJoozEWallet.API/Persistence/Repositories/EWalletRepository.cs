@@ -34,7 +34,7 @@ namespace iJoozEWallet.API.Persistence.Repositories
             }
         }
 
-        public async Task<EWallet> FindByUserIdAsync(int userId)
+        public async Task<EWallet> FindByUserIdAsync(string userId)
         {
             return await _context.EWallet
                 .Include(e=>e.TopUpHistories)

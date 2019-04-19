@@ -15,14 +15,14 @@ namespace iJoozEWallet.API.Test.Services
         {
             _testDataFixture = new TestDataFixture();
             _testData = new TestData();
-            _testDataFixture.EWalletRepository.Setup(e => e.FindByUserIdAsync(100)).ReturnsAsync(null as EWallet);
-            _testDataFixture.EWalletRepository.Setup(e => e.FindByUserIdAsync(200)).ReturnsAsync(_testData.EWallet);
+            _testDataFixture.EWalletRepository.Setup(e => e.FindByUserIdAsync("100")).ReturnsAsync(null as EWallet);
+            _testDataFixture.EWalletRepository.Setup(e => e.FindByUserIdAsync("200")).ReturnsAsync(_testData.EWallet);
         }
 
         [Fact]
         public async void ShouldSaveTopUp__whenUserNotExists()
         {
-            _testData.TopUpResource.UserId = 100;
+            _testData.TopUpResource.UserId = "100";
             var response = await _testDataFixture.EWalletService.SaveTopUpAsync(_testData.TopUpResource);
             Assert.True(response.BaseResponse.Success);
             Assert.Equal(100, response.EWallet.Balance);
@@ -38,7 +38,7 @@ namespace iJoozEWallet.API.Test.Services
         [Fact]
         public async void ShouldSaveTopUp__whenUserExists()
         {
-            _testData.TopUpResource.UserId = 200;
+            _testData.TopUpResource.UserId = "200";
             var response = await _testDataFixture.EWalletService.SaveTopUpAsync(_testData.TopUpResource);
             Assert.True(response.BaseResponse.Success);
             Assert.Equal(200, response.EWallet.Balance);
@@ -55,7 +55,7 @@ namespace iJoozEWallet.API.Test.Services
         [Fact]
         public async void ShouldThrowException__whenTopUpTransactionIdExists()
         {
-            _testData.TopUpResource.UserId = 200;
+            _testData.TopUpResource.UserId = "200";
             _testData.TopUpResource.TransactionId = "feedTopUpTransactionId";
             var response = await _testDataFixture.EWalletService.SaveTopUpAsync(_testData.TopUpResource);
             Assert.False(response.BaseResponse.Success);
@@ -69,7 +69,7 @@ namespace iJoozEWallet.API.Test.Services
         [Fact]
         public async void ShouldThrowException__whenUserNotExists__Deduct()
         {
-            _testData.DeductResource.UserId = 100;
+            _testData.DeductResource.UserId = "100";
             var response = await _testDataFixture.EWalletService.SaveDeductAsync(_testData.DeductResource);
             Assert.False(response.BaseResponse.Success);
             var transactionErrMsg = string.Format(Constants.DeductUserNotExistsErrMsg,
@@ -81,7 +81,7 @@ namespace iJoozEWallet.API.Test.Services
         [Fact]
         public async void ShouldThrowException__whenTransactionIdExists__Deduct()
         {
-            _testData.DeductResource.UserId = 200;
+            _testData.DeductResource.UserId = "200";
             _testData.DeductResource.TransactionId = "feedDeductTransactionId";
             var response = await _testDataFixture.EWalletService.SaveDeductAsync(_testData.DeductResource);
             Assert.False(response.BaseResponse.Success);
@@ -94,7 +94,7 @@ namespace iJoozEWallet.API.Test.Services
         [Fact]
         public async void ShouldThrowException__whenBalanceLessThanDeduction()
         {
-            _testData.DeductResource.UserId = 200;
+            _testData.DeductResource.UserId = "200";
             _testData.DeductResource.Amount = 101;
             var response = await _testDataFixture.EWalletService.SaveDeductAsync(_testData.DeductResource);
             Assert.False(response.BaseResponse.Success);
@@ -108,7 +108,7 @@ namespace iJoozEWallet.API.Test.Services
         [Fact]
         public async void ShouldDeductBalance__whenBalanceGreaterThanDeduction()
         {
-            _testData.DeductResource.UserId = 200;
+            _testData.DeductResource.UserId = "200";
             _testData.DeductResource.Amount = 99;
             var response = await _testDataFixture.EWalletService.SaveDeductAsync(_testData.DeductResource);
             Assert.True(response.BaseResponse.Success);

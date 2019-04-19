@@ -38,7 +38,7 @@ namespace iJoozEWallet.API.Controllers
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetAllTransactionByUserIdAsync([FromRoute] int userId)
+        public async Task<IActionResult> GetAllTransactionByUserIdAsync([FromRoute] string userId)
         {
             var eWallet = await _eWalletService.FindByUserIdAsync(userId);
 

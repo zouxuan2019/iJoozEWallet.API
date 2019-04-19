@@ -71,7 +71,7 @@ namespace iJoozEWallet.API.Services
             }
         }
 
-        public async Task<EWallet> FindByUserIdAsync(int userId)
+        public async Task<EWallet> FindByUserIdAsync(string userId)
         {
             return await _eWalletRepository.FindByUserIdAsync(userId);
         }

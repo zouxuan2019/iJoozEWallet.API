@@ -13,7 +13,7 @@ namespace iJoozEWallet.API.Domain.Models
         public Result Result { get; set; }
         public DateTime ActionDate { get; set; }
 
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public EWallet EWallet { get; set; }
     }
 }
