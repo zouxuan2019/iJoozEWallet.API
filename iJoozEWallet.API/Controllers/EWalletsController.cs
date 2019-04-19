@@ -8,6 +8,7 @@ using iJoozEWallet.API.Extensions;
 using iJoozEWallet.API.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace iJoozEWallet.API.Controllers
 {
@@ -68,6 +69,8 @@ namespace iJoozEWallet.API.Controllers
         [HttpPost("saveTopUp")]
         public async Task<IActionResult> SaveTopUpAsync([FromBody] TopUpResource resource)
         {
+            _logger.LogInformation("saveTopUp Request:" + JsonConvert.SerializeObject(resource));
+            
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrorMessages());
@@ -80,12 +83,14 @@ namespace iJoozEWallet.API.Controllers
             }
 
             var eWalletResource = _mapper.Map<EWallet, EWalletResource>(result.EWallet);
+            _logger.LogInformation("saveTopUp Response:" + JsonConvert.SerializeObject(eWalletResource));
             return Ok(eWalletResource);
         }
 
         [HttpPost("saveDeduct")]
         public async Task<IActionResult> SaveDeductAsync([FromBody] DeductResource resource)
         {
+            _logger.LogInformation("saveDeduct Request:" + JsonConvert.SerializeObject(resource));
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrorMessages());
@@ -98,6 +103,7 @@ namespace iJoozEWallet.API.Controllers
             }
 
             var eWalletResource = _mapper.Map<EWallet, EWalletResource>(result.EWallet);
+            _logger.LogInformation("saveDeduct Response:" + JsonConvert.SerializeObject(eWalletResource));
             return Ok(eWalletResource);
         }
     }

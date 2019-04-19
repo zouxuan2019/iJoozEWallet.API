@@ -16,17 +16,17 @@ namespace iJoozEWallet.API.Services
 {
     public class EWalletService : IEWalletService
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<EWalletService> _logger;
         private readonly IEWalletRepository _eWalletRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public EWalletService(ILoggerFactory depLoggerFactory, IEWalletRepository eWalletRepository,
+        public EWalletService(ILogger<EWalletService> logger, IEWalletRepository eWalletRepository,
             IUnitOfWork unitOfWork,
             IMapper mapper
         )
         {
-            _logger = depLoggerFactory.CreateLogger("Services.EWalletService");
+            _logger = logger;
             _eWalletRepository = eWalletRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -47,9 +47,10 @@ namespace iJoozEWallet.API.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error occurred when saving the top up transaction: {ex.Message}");
+                var errorMessage = string.Format(Constants.TopUpWrapperErrMsg, ex.Message);
+                _logger.LogError(errorMessage);
                 return new SaveTransactionResponse(
-                    $"An error occurred when saving the top up transaction: {ex.Message}");
+                    errorMessage);
             }
         }
 
@@ -63,9 +64,10 @@ namespace iJoozEWallet.API.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error occurred when saving the deduct transaction: {ex.Message}");
+                var errorMessage = string.Format(Constants.DeductWrapperErrMsg, ex.Message);
+                _logger.LogError(errorMessage);
                 return new SaveTransactionResponse(
-                    $"An error occurred when saving the deduct transaction: {ex.Message}");
+                    errorMessage);
             }
         }
 
@@ -73,6 +75,7 @@ namespace iJoozEWallet.API.Services
         {
             return await _eWalletRepository.FindByUserIdAsync(userId);
         }
+
         public async Task<TopUpHistory> FindByTopUpTransactionIdAsync(string transactionId)
         {
             return await _eWalletRepository.FindByTopUpTransactionIdAsync(transactionId);
@@ -83,24 +86,21 @@ namespace iJoozEWallet.API.Services
             var eWallet = await _eWalletRepository.FindByUserIdAsync(deductResource.UserId);
             if (eWallet == null)
             {
-                throw new Exception($"UserId:({deductResource.UserId}) doesn't exists, cannot deduct credit");
+                throw new Exception(string.Format(Constants.DeductUserNotExistsErrMsg, deductResource.UserId));
             }
 
-            if (ExistTopUpTransactionId(deductResource.TransactionId, eWallet.TopUpHistories))
+            if (ExistDeductTransactionId(deductResource.TransactionId, eWallet.DeductHistories))
             {
-                throw new Exception($"TransactionId:({deductResource.TransactionId}) already exists");
+                throw new Exception(string.Format(Constants.TransactionIdExistsErrMsg, deductResource.TransactionId));
             }
 
-            if (eWallet.Balance >= deductResource.Amount)
+            if (!(eWallet.Balance >= deductResource.Amount))
             {
-                eWallet.Balance -= deductResource.Result == Result.Success ? deductResource.Amount : 0;
-            }
-            else
-            {
-                throw new Exception($"TransactionId:({deductResource.TransactionId}) failed, " +
-                                    $"balance:{eWallet.Balance} is less than deduction amount {deductResource.Amount}");
+                throw new Exception(string.Format(Constants.BalanceLessThanDeductionErrMsg,
+                    deductResource.TransactionId, eWallet.Balance, deductResource.Amount));
             }
 
+            eWallet.Balance -= deductResource.Result == Result.Success ? deductResource.Amount : 0;
             var deductHistory = _mapper.Map<DeductResource, DeductHistory>(deductResource);
             eWallet.DeductHistories.Add(deductHistory);
             _eWalletRepository.AddOrUpdateEWallet(eWallet, false);
@@ -124,14 +124,13 @@ namespace iJoozEWallet.API.Services
             }
             else
             {
-                if (!ExistTopUpTransactionId(topUpResource.TransactionId, eWallet.TopUpHistories))
+                if (ExistTopUpTransactionId(topUpResource.TransactionId, eWallet.TopUpHistories))
                 {
-                    eWallet.Balance += topUpResource.Result == Result.Success ? topUpResource.Amount : 0;
+                    throw new Exception(string.Format(Constants.TransactionIdExistsErrMsg,
+                        topUpResource.TransactionId));
                 }
-                else
-                {
-                    throw new Exception($"TransactionId:({topUpResource.TransactionId})already exists");
-                }
+
+                eWallet.Balance += topUpResource.Result == Result.Success ? topUpResource.Amount : 0;
             }
 
             var topUpHistory = _mapper.Map<TopUpResource, TopUpHistory>(topUpResource);
@@ -141,9 +140,16 @@ namespace iJoozEWallet.API.Services
             return eWallet;
         }
 
-        private bool ExistTopUpTransactionId(string topUpTransactionId, IEnumerable<TopUpHistory> eWalletTopUpHistories)
+        private static bool ExistTopUpTransactionId(string topUpTransactionId,
+            IEnumerable<TopUpHistory> eWalletTopUpHistories)
         {
             return eWalletTopUpHistories.Any(x => x.TransactionId.Equals(topUpTransactionId));
+        }
+
+        private static bool ExistDeductTransactionId(string deductTransactionId,
+            IEnumerable<DeductHistory> eWalletDeductHistories)
+        {
+            return eWalletDeductHistories.Any(x => x.TransactionId.Equals(deductTransactionId));
         }
     }
 }

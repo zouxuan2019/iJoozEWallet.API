@@ -29,6 +29,9 @@ namespace iJoozEWallet.API
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddDbContext<AppDbContext>(options => { options.UseInMemoryDatabase("ijooz-db-in-memory"); });
+//            services.AddDbContext<AppDbContext>(options =>
+//                options.UseSqlServer(
+//                    Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IEWalletRepository, EWalletRepository>();
             services.AddScoped<IEWalletService, EWalletService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();

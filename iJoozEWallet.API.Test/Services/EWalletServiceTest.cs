@@ -1,57 +1,124 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using iJoozEWallet.API.Domain.Models;
-using iJoozEWallet.API.Persistence.Contexts;
-using iJoozEWallet.API.Resources;
-using iJoozEWallet.API.Services;
 using iJoozEWallet.API.Utils;
 using Moq;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace iJoozEWallet.API.Test.Services
 {
-    public class EWalletServiceTest
+    [Collection("Sequential")]
+    public class EWalletServiceTest : IClassFixture<TestDataFixture>
     {
-        private readonly ITestOutputHelper _testOutputHelper;
+        private readonly TestDataFixture _testDataFixture;
+        private TestData _testData;
 
-        public EWalletServiceTest(ITestOutputHelper testOutputHelper)
+        public EWalletServiceTest()
         {
-            _testOutputHelper = testOutputHelper;
+            _testDataFixture = new TestDataFixture();
+            _testData = new TestData();
+            _testDataFixture.EWalletRepository.Setup(e => e.FindByUserIdAsync(200)).ReturnsAsync(_testData.EWallet);
         }
-
-        private EWalletService eWalletService;
-
-        Mock<AppDbContext> dbContext = new Mock<AppDbContext>();
 
         [Fact]
-        public async void ShouldSaveTopUp()
+        public async void ShouldSaveTopUp__whenUserNotExists()
         {
-            EWallet eWallet = new EWallet
-            {
-                UserId = 100, Balance = 100, TopUpHistories = new List<TopUpHistory>
-                {
-                    new TopUpHistory {TransactionId = "abc", Amount = 100, Result = Result.Success}
-                }
-            };
-            dbContext.Setup(db => db.EWallet.FindAsync(It.IsAny<int>())).ReturnsAsync(eWallet);
-            
-            TopUpResource topUpResource = new TopUpResource
-            {
-                UserId = 100,
-                Amount = 100,
-                ActionDate = DateTime.Now,
-                PaymentMerchant = "Visa",
-                PaymentReferenceNo = "abc",
-                Result = Result.Success,
-                TransactionId = "aaa"
-            };
-
-            var response = await eWalletService.SaveTopUpAsync(topUpResource);
-            Assert.Same(response.BaseResponse.Success, true);
-            Assert.Same(response.EWallet.Balance, 200);
+            _testData.TopUpResource.UserId = 100;
+            var response = await _testDataFixture.EWalletService.SaveTopUpAsync(_testData.TopUpResource);
+            Assert.True(response.BaseResponse.Success);
+            Assert.Equal(100, response.EWallet.Balance);
+            Assert.Equal(1, response.EWallet.TopUpHistories.Count);
+            Assert.Equal(_testData.TopUpResource.TransactionId,
+                response.EWallet.TopUpHistories[0].TransactionId);
+            _testDataFixture.EWalletRepository.Verify(x => x.FindByUserIdAsync(_testData.TopUpResource.UserId),
+                Times.Once);
+            _testDataFixture.EWalletRepository.Verify(x => x.AddOrUpdateEWallet(It.IsAny<EWallet>(), true), Times.Once);
+            _testDataFixture.UnitOfWork.Verify(x => x.CompleteAsync(), Times.Once);
         }
 
+        [Fact]
+        public async void ShouldSaveTopUp__whenUserExists()
+        {
+            _testData.TopUpResource.UserId = 200;
+            var response = await _testDataFixture.EWalletService.SaveTopUpAsync(_testData.TopUpResource);
+            Assert.True(response.BaseResponse.Success);
+            Assert.Equal(200, response.EWallet.Balance);
+            Assert.Equal(2, response.EWallet.TopUpHistories.Count);
+            Assert.Equal(_testData.TopUpResource.TransactionId,
+                response.EWallet.TopUpHistories[1].TransactionId);
+            _testDataFixture.EWalletRepository.Verify(x => x.FindByUserIdAsync(_testData.TopUpResource.UserId),
+                Times.Once);
+            _testDataFixture.EWalletRepository.Verify(x => x.AddOrUpdateEWallet(It.IsAny<EWallet>(), false),
+                Times.Once);
+            _testDataFixture.UnitOfWork.Verify(x => x.CompleteAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async void ShouldThrowException__whenTopUpTransactionIdExists()
+        {
+            _testData.TopUpResource.UserId = 200;
+            _testData.TopUpResource.TransactionId = "feedTopUpTransactionId";
+            var response = await _testDataFixture.EWalletService.SaveTopUpAsync(_testData.TopUpResource);
+            Assert.False(response.BaseResponse.Success);
+            var transactionErrMsg = string.Format(Constants.TransactionIdExistsErrMsg,
+                _testData.TopUpResource.TransactionId);
+            var wrappedErrMsg = string.Format(Constants.TopUpWrapperErrMsg, transactionErrMsg);
+            Assert.Equal(wrappedErrMsg, response.BaseResponse.Message);
+        }
+
+
+        [Fact]
+        public async void ShouldThrowException__whenUserNotExists__Deduct()
+        {
+            _testData.DeductResource.UserId = 100;
+            var response = await _testDataFixture.EWalletService.SaveDeductAsync(_testData.DeductResource);
+            Assert.False(response.BaseResponse.Success);
+            var transactionErrMsg = string.Format(Constants.DeductUserNotExistsErrMsg,
+                _testData.DeductResource.UserId);
+            var wrappedErrMsg = string.Format(Constants.DeductWrapperErrMsg, transactionErrMsg);
+            Assert.Equal(wrappedErrMsg, response.BaseResponse.Message);
+        }
+
+        [Fact]
+        public async void ShouldThrowException__whenTransactionIdExists__Deduct()
+        {
+            _testData.DeductResource.UserId = 200;
+            _testData.DeductResource.TransactionId = "feedDeductTransactionId";
+            var response = await _testDataFixture.EWalletService.SaveDeductAsync(_testData.DeductResource);
+            Assert.False(response.BaseResponse.Success);
+            var transactionErrMsg = string.Format(Constants.TransactionIdExistsErrMsg,
+                _testData.DeductResource.TransactionId);
+            var wrappedErrMsg = string.Format(Constants.DeductWrapperErrMsg, transactionErrMsg);
+            Assert.Equal(wrappedErrMsg, response.BaseResponse.Message);
+        }
+
+        [Fact]
+        public async void ShouldThrowException__whenBalanceLessThanDeduction()
+        {
+            _testData.DeductResource.UserId = 200;
+            _testData.DeductResource.Amount = 101;
+            var response = await _testDataFixture.EWalletService.SaveDeductAsync(_testData.DeductResource);
+            Assert.False(response.BaseResponse.Success);
+            var transactionErrMsg = string.Format(Constants.BalanceLessThanDeductionErrMsg,
+                _testData.DeductResource.TransactionId, _testData.EWallet.Balance,
+                _testData.DeductResource.Amount);
+            var wrappedErrMsg = string.Format(Constants.DeductWrapperErrMsg, transactionErrMsg);
+            Assert.Equal(wrappedErrMsg, response.BaseResponse.Message);
+        }
+
+        [Fact]
+        public async void ShouldDeductBalance__whenBalanceGreaterThanDeduction()
+        {
+            _testData.DeductResource.UserId = 200;
+            _testData.DeductResource.Amount = 99;
+            var response = await _testDataFixture.EWalletService.SaveDeductAsync(_testData.DeductResource);
+            Assert.True(response.BaseResponse.Success);
+            Assert.Equal(1, response.EWallet.Balance);
+            Assert.Equal(2, response.EWallet.DeductHistories.Count);
+            Assert.Equal(_testData.DeductResource.TransactionId,
+                response.EWallet.DeductHistories[1].TransactionId);
+            _testDataFixture.EWalletRepository.Verify(x => x.FindByUserIdAsync(_testData.DeductResource.UserId),
+                Times.Once);
+            _testDataFixture.EWalletRepository.Verify(x => x.AddOrUpdateEWallet(It.IsAny<EWallet>(), false), Times.Once);
+            _testDataFixture.UnitOfWork.Verify(x => x.CompleteAsync(), Times.Once);
+        }
     }
 }
