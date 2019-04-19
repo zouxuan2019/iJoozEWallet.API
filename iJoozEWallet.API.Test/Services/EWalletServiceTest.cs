@@ -15,6 +15,7 @@ namespace iJoozEWallet.API.Test.Services
         {
             _testDataFixture = new TestDataFixture();
             _testData = new TestData();
+            _testDataFixture.EWalletRepository.Setup(e => e.FindByUserIdAsync(100)).ReturnsAsync(null as EWallet);
             _testDataFixture.EWalletRepository.Setup(e => e.FindByUserIdAsync(200)).ReturnsAsync(_testData.EWallet);
         }
 

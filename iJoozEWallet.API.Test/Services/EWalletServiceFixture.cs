@@ -31,7 +31,6 @@ namespace iJoozEWallet.API.Test.Services
             UnitOfWork = new Mock<IUnitOfWork>();
             EWalletService = new EWalletService(_logger.Object, EWalletRepository.Object, UnitOfWork.Object,
                 mapper);
-            EWalletRepository.Setup(e => e.FindByUserIdAsync(100)).ReturnsAsync(null as EWallet);
         }
 
         public void Dispose()
