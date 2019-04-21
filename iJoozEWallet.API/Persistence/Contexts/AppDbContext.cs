@@ -64,6 +64,7 @@ namespace iJoozEWallet.API.Persistence.Contexts
             builder.Entity<TopUpHistory>().Property(p => p.Amount).IsRequired();
             builder.Entity<TopUpHistory>().Property(p => p.TransactionId).IsRequired();
             builder.Entity<TopUpHistory>().Property(p => p.ActionDate).IsRequired();
+            builder.Entity<TopUpHistory>().Property(p => p.Status).IsRequired();
             builder.Entity<TopUpHistory>().HasOne(p => p.EWallet)
                 .WithMany(e => e.TopUpHistories)
                 .HasForeignKey(t => t.UserId);
@@ -78,6 +79,8 @@ namespace iJoozEWallet.API.Persistence.Contexts
             builder.Entity<DeductHistory>().Property(p => p.Amount).IsRequired();
             builder.Entity<DeductHistory>().Property(p => p.Product).IsRequired();
             builder.Entity<DeductHistory>().Property(p => p.ActionDate).IsRequired();
+            builder.Entity<DeductHistory>().Property(p => p.Company).IsRequired();
+            builder.Entity<DeductHistory>().Property(p => p.Status).IsRequired();
             builder.Entity<DeductHistory>().HasOne(p => p.EWallet)
                 .WithMany(e => e.DeductHistories)
                 .HasForeignKey(t => t.UserId);

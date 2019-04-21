@@ -62,7 +62,8 @@ namespace iJoozEWallet.API.Controllers
                 return NotFound($"transactionId: {transactionId} Not found");
             }
 
-            var eWalletResource = _mapper.Map<TopUpHistory, TopUpResource>(topUpHistory);
+            var eWalletResource = _mapper.Map<IEnumerable<TopUpHistory>, IEnumerable<TopUpResource>>(topUpHistory);
+
             return Ok(eWalletResource);
         }
 
@@ -70,7 +71,7 @@ namespace iJoozEWallet.API.Controllers
         public async Task<IActionResult> SaveTopUpAsync([FromBody] TopUpResource resource)
         {
             _logger.LogInformation("saveTopUp Request:" + JsonConvert.SerializeObject(resource));
-            
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrorMessages());
@@ -82,8 +83,10 @@ namespace iJoozEWallet.API.Controllers
                 return BadRequest(result.BaseResponse.Message);
             }
 
-            var eWalletResource = _mapper.Map<EWallet, EWalletResource>(result.EWallet);
+            var eWalletResource = _mapper.Map<EWallet, TopUpDeductionResource>(result.EWallet);
+            eWalletResource.TransactionId = resource.TransactionId;
             _logger.LogInformation("saveTopUp Response:" + JsonConvert.SerializeObject(eWalletResource));
+
             return Ok(eWalletResource);
         }
 
@@ -102,7 +105,8 @@ namespace iJoozEWallet.API.Controllers
                 return BadRequest(result.BaseResponse.Message);
             }
 
-            var eWalletResource = _mapper.Map<EWallet, EWalletResource>(result.EWallet);
+            var eWalletResource = _mapper.Map<EWallet, TopUpDeductionResource>(result.EWallet);
+            eWalletResource.TransactionId = resource.TransactionId;
             _logger.LogInformation("saveDeduct Response:" + JsonConvert.SerializeObject(eWalletResource));
             return Ok(eWalletResource);
         }

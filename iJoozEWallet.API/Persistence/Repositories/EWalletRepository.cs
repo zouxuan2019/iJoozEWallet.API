@@ -17,8 +17,8 @@ namespace iJoozEWallet.API.Persistence.Repositories
         public async Task<IEnumerable<EWallet>> ListAllAsync()
         {
             return await _context.EWallet
-                .Include(e=>e.TopUpHistories)
-                .Include(e=>e.DeductHistories)
+                .Include(e => e.TopUpHistories)
+                .Include(e => e.DeductHistories)
                 .ToListAsync();
         }
 
@@ -37,14 +37,15 @@ namespace iJoozEWallet.API.Persistence.Repositories
         public async Task<EWallet> FindByUserIdAsync(string userId)
         {
             return await _context.EWallet
-                .Include(e=>e.TopUpHistories)
-                .Include(e=>e.DeductHistories)
-                .SingleOrDefaultAsync(e=>e.UserId==userId);
+                .Include(e => e.TopUpHistories)
+                .Include(e => e.DeductHistories)
+                .SingleOrDefaultAsync(e => e.UserId == userId);
         }
 
-        public async Task<TopUpHistory> FindByTopUpTransactionIdAsync(string transactionId)
+        public async Task<IEnumerable<TopUpHistory>> FindByTopUpTransactionIdAsync(string transactionId)
         {
-            return await _context.TopUpHistories.SingleOrDefaultAsync(t => t.TransactionId == transactionId);
+            return await _context.TopUpHistories.Where(t => t.TransactionId == transactionId)
+                .ToListAsync();
         }
     }
 }

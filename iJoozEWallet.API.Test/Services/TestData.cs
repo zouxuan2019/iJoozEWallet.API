@@ -14,7 +14,7 @@ namespace iJoozEWallet.API.Test.Services
             ActionDate = DateTime.Now,
             PaymentMerchant = "Visa",
             PaymentReferenceNo = "abc",
-            Result = Result.Success,
+            Status = Status.Success,
             TransactionId = "aaa"
         };
 
@@ -22,7 +22,6 @@ namespace iJoozEWallet.API.Test.Services
         {
             Amount = 100,
             ActionDate = DateTime.Now,
-            Result = Result.Success,
             Product = "11",
             TransactionId = "aaa"
         };
@@ -37,7 +36,7 @@ namespace iJoozEWallet.API.Test.Services
                 new DeductHistory
                 {
                     Id = 1, UserId = "200", ActionDate = DateTime.Parse("2019-01-01"),
-                    Result = Result.Success,
+                    Status = Status.Success,
                     Amount = 100, TransactionId = "feedDeductTransactionId"
                 }
             },
@@ -46,7 +45,7 @@ namespace iJoozEWallet.API.Test.Services
                 new TopUpHistory
                 {
                     Id = 1, UserId = "200", ActionDate = DateTime.Parse("2019-01-01"),
-                    Result = Result.Success,
+                    Status = Status.Success,
                     Amount = 100, TransactionId = "feedTopUpTransactionId"
                 }
             }

@@ -10,10 +10,15 @@ namespace iJoozEWallet.API.Resources
         [Required] public double Amount { get; set; }
         public string TransactionId { get; set; }
         public string Product { get; set; }
-        public Result Result { get; set; }
+
+        public string Company { get; set; }
+
+        public Status Status { get; set; }
+
+        public string Comment { get; set; }
 
         [Required] public string UserId { get; set; }
-        
+
         [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime ActionDate { get; set; }
     }

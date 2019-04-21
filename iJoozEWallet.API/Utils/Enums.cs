@@ -1,8 +1,17 @@
+using System.ComponentModel;
+using System.Runtime.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace iJoozEWallet.API.Utils
 {
-    public enum Result
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum Status
     {
-          Success,
-          Fail
+        [EnumMember(Value = "Success")] Success,
+
+        [EnumMember(Value = "Fail")] Fail,
+
+        [EnumMember(Value = "Init")] Init
     }
 }

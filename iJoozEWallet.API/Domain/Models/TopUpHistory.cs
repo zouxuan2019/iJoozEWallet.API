@@ -10,7 +10,7 @@ namespace iJoozEWallet.API.Domain.Models
         public string TransactionId { get; set; }
         public string PaymentReferenceNo { get; set; }
         public string PaymentMerchant { get; set; }
-        public Result Result { get; set; }
+        public Status Status { get; set; }
         public DateTime ActionDate { get; set; }
 
         public string UserId { get; set; }

@@ -10,6 +10,7 @@ namespace iJoozEWallet.API.Mapping
         {
             CreateMap<EWallet, EWalletResource>();
             CreateMap<TopUpHistory, TopUpResource>();
+            CreateMap<EWallet, TopUpDeductionResource>();
         }
     }
 }
