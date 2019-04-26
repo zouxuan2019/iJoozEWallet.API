@@ -6,6 +6,7 @@ using iJoozEWallet.API.Domain.Models;
 using iJoozEWallet.API.Domain.Services;
 using iJoozEWallet.API.Extensions;
 using iJoozEWallet.API.Resources;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -14,6 +15,7 @@ namespace iJoozEWallet.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class EWalletsController : ControllerBase
     {
         private readonly ILogger _logger;

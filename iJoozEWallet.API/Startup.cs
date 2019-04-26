@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using AutoMapper;
 using iJoozEWallet.API.Domain.Repositories;
 using iJoozEWallet.API.Domain.Services;
@@ -6,13 +10,17 @@ using iJoozEWallet.API.Persistence;
 using iJoozEWallet.API.Persistence.Contexts;
 using iJoozEWallet.API.Persistence.Repositories;
 using iJoozEWallet.API.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 
 namespace iJoozEWallet.API
@@ -38,6 +46,23 @@ namespace iJoozEWallet.API
         public void ConfigureDevelopmentServices(IServiceCollection services)
         {
             CommonConfig(services);
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuerSigningKey = true,
+                ValidateIssuer = false,
+                IssuerSigningKey = new X509SecurityKey(new X509Certificate2("ijooz.crt")),
+            };
+            services.AddAuthentication()
+                .AddJwtBearer(options => { options.TokenValidationParameters = tokenValidationParameters; });
+            services.AddAuthorization(options =>
+            {
+                options.DefaultPolicy =
+                    new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                        .RequireAuthenticatedUser()
+                        .Build();
+            });
+
             services.AddDbContext<AppDbContext>(options => { options.UseInMemoryDatabase("ijooz-db-in-memory"); });
         }
 
@@ -45,6 +70,7 @@ namespace iJoozEWallet.API
         private static void CommonConfig(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
             services.AddScoped<IEWalletRepository, EWalletRepository>();
             services.AddScoped<IEWalletService, EWalletService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -65,6 +91,7 @@ namespace iJoozEWallet.API
                 app.UseHsts();
             }
 
+            app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseMvc();
         }
