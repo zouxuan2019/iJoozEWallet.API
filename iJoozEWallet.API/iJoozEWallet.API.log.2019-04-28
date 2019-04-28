@@ -1,0 +1,36 @@
+2019-04-28 23:51:08,402  INFO Microsoft.AspNetCore.Authorization.DefaultAuthorizationService.? [?] - MESSAGE: Authorization failed.
+ 2019-04-28 23:51:08,416  INFO Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker.? [?] - MESSAGE: Authorization failed for the request at filter 'Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter'.
+ 2019-04-28 23:51:08,423  INFO Microsoft.AspNetCore.Mvc.ChallengeResult.? [?] - MESSAGE: Executing ChallengeResult with authentication schemes (Bearer).
+ 2019-04-28 23:51:08,436  INFO Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerHandler.? [?] - MESSAGE: AuthenticationScheme: Bearer was challenged.
+ 2019-04-28 23:51:08,440  INFO Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker.? [?] - MESSAGE: Executed action iJoozEWallet.API.Controllers.EWalletsController.GetAllAsync (iJoozEWallet.API) in 73.7682ms
+ 2019-04-28 23:51:08,440  INFO Microsoft.AspNetCore.Routing.EndpointMiddleware.? [?] - MESSAGE: Executed endpoint 'iJoozEWallet.API.Controllers.EWalletsController.GetAllAsync (iJoozEWallet.API)'
+ 2019-04-28 23:51:08,442  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request finished in 107.6563ms 401 
+ 2019-04-28 23:52:05,053  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request starting HTTP/1.1 GET https://localhost:5001/swagger/index.html  
+ 2019-04-28 23:52:05,228  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request finished in 178.704ms 200 text/html;charset=utf-8
+ 2019-04-28 23:52:05,936  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request starting HTTP/1.1 GET https://localhost:5001/swagger/v1/swagger.json  
+ 2019-04-28 23:52:06,176  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request finished in 239.809ms 200 application/json;charset=utf-8
+ 2019-04-28 23:52:16,886  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request starting HTTP/1.1 GET https://localhost:5001/api/EWallets  
+ 2019-04-28 23:52:16,889  INFO Microsoft.AspNetCore.Routing.EndpointMiddleware.? [?] - MESSAGE: Executing endpoint 'iJoozEWallet.API.Controllers.EWalletsController.GetAllAsync (iJoozEWallet.API)'
+ 2019-04-28 23:52:16,942  INFO Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker.? [?] - MESSAGE: Route matched with {action = "GetAllAsync", controller = "EWallets"}. Executing action iJoozEWallet.API.Controllers.EWalletsController.GetAllAsync (iJoozEWallet.API)
+ 2019-04-28 23:52:16,976  INFO Microsoft.AspNetCore.Authorization.DefaultAuthorizationService.? [?] - MESSAGE: Authorization failed.
+ 2019-04-28 23:52:16,976  INFO Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker.? [?] - MESSAGE: Authorization failed for the request at filter 'Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter'.
+ 2019-04-28 23:52:16,984  INFO Microsoft.AspNetCore.Mvc.ChallengeResult.? [?] - MESSAGE: Executing ChallengeResult with authentication schemes (Bearer).
+ 2019-04-28 23:52:16,992  INFO Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerHandler.? [?] - MESSAGE: AuthenticationScheme: Bearer was challenged.
+ 2019-04-28 23:52:16,994  INFO Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker.? [?] - MESSAGE: Executed action iJoozEWallet.API.Controllers.EWalletsController.GetAllAsync (iJoozEWallet.API) in 50.3604ms
+ 2019-04-28 23:52:16,995  INFO Microsoft.AspNetCore.Routing.EndpointMiddleware.? [?] - MESSAGE: Executed endpoint 'iJoozEWallet.API.Controllers.EWalletsController.GetAllAsync (iJoozEWallet.API)'
+ 2019-04-28 23:52:16,996  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request finished in 110.1507ms 401 
+ 2019-04-28 23:54:38,519  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request starting HTTP/1.1 GET https://localhost:5001/swagger/index.html  
+ 2019-04-28 23:54:38,716  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request finished in 203.7785ms 200 text/html;charset=utf-8
+ 2019-04-28 23:54:39,276  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request starting HTTP/1.1 GET https://localhost:5001/swagger/v1/swagger.json  
+ 2019-04-28 23:54:39,481  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request finished in 205.069ms 200 application/json;charset=utf-8
+ 2019-04-28 23:55:09,527  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request starting HTTP/1.1 GET https://localhost:5001/api/EWallets  
+ 2019-04-28 23:55:09,530  INFO Microsoft.AspNetCore.Routing.EndpointMiddleware.? [?] - MESSAGE: Executing endpoint 'iJoozEWallet.API.Controllers.EWalletsController.GetAllAsync (iJoozEWallet.API)'
+ 2019-04-28 23:55:09,559  INFO Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker.? [?] - MESSAGE: Route matched with {action = "GetAllAsync", controller = "EWallets"}. Executing action iJoozEWallet.API.Controllers.EWalletsController.GetAllAsync (iJoozEWallet.API)
+ 2019-04-28 23:55:09,594  INFO Microsoft.AspNetCore.Authorization.DefaultAuthorizationService.? [?] - MESSAGE: Authorization failed.
+ 2019-04-28 23:55:09,595  INFO Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker.? [?] - MESSAGE: Authorization failed for the request at filter 'Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter'.
+ 2019-04-28 23:55:09,601  INFO Microsoft.AspNetCore.Mvc.ChallengeResult.? [?] - MESSAGE: Executing ChallengeResult with authentication schemes (Bearer).
+ 2019-04-28 23:55:09,613  INFO Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerHandler.? [?] - MESSAGE: AuthenticationScheme: Bearer was challenged.
+ 2019-04-28 23:55:09,616  INFO Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker.? [?] - MESSAGE: Executed action iJoozEWallet.API.Controllers.EWalletsController.GetAllAsync (iJoozEWallet.API) in 53.3839ms
+ 2019-04-28 23:55:09,616  INFO Microsoft.AspNetCore.Routing.EndpointMiddleware.? [?] - MESSAGE: Executed endpoint 'iJoozEWallet.API.Controllers.EWalletsController.GetAllAsync (iJoozEWallet.API)'
+ 2019-04-28 23:55:09,617  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request finished in 90.0856ms 401 
+ 

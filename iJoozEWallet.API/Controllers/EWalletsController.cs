@@ -31,6 +31,7 @@ namespace iJoozEWallet.API.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
         public async Task<IEnumerable<EWalletResource>> GetAllAsync()
         {
             var eWalletBalances = await _eWalletService.ListAllAsync();
