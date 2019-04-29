@@ -137,7 +137,7 @@ namespace iJoozEWallet.API
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "AbpZeroTemplate API V1");
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "EWallet API V1");
             });
         }
     }
