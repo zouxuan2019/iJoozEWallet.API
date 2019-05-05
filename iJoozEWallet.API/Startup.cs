@@ -39,16 +39,17 @@ namespace iJoozEWallet.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            byte[] signingKey = Convert.FromBase64String(Environment.GetEnvironmentVariable("SigningKey"));
-            var issuerSigningKey = new X509SecurityKey(new X509Certificate2(new X509Certificate(signingKey)));
-            CommonConfig(services, issuerSigningKey);
+            CommonConfig(services);
 
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(Environment.GetEnvironmentVariable("DbConnectionString")));
         }
 
-        private static void VerifyAuthentication(IServiceCollection services, X509SecurityKey issuerSigningKey)
+        private static void VerifyAuthentication(IServiceCollection services)
         {
+            byte[] signingKey = Convert.FromBase64String(Environment.GetEnvironmentVariable("SigningKey"));
+            var issuerSigningKey = new X509SecurityKey(new X509Certificate2(new X509Certificate(signingKey)));
+
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = false,
@@ -69,14 +70,12 @@ namespace iJoozEWallet.API
 
         public void ConfigureDevelopmentServices(IServiceCollection services)
         {
-            var issuerSigningKey = new X509SecurityKey(new X509Certificate2("ijooz.crt"));
-            CommonConfig(services, issuerSigningKey);
-
+            CommonConfig(services);
             services.AddDbContext<AppDbContext>(options => { options.UseInMemoryDatabase("ijooz-db-in-memory"); });
         }
 
 
-        private static void CommonConfig(IServiceCollection services, X509SecurityKey issuerSigningKey)
+        private static void CommonConfig(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
@@ -86,7 +85,7 @@ namespace iJoozEWallet.API
             services.AddAutoMapper();
 
             SwaggerConfig(services);
-            VerifyAuthentication(services, issuerSigningKey);
+            VerifyAuthentication(services);
         }
 
         private static void SwaggerConfig(IServiceCollection services)
