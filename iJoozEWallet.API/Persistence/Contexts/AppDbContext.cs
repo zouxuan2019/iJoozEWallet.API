@@ -14,6 +14,15 @@ namespace iJoozEWallet.API.Persistence.Contexts
         {
         }
 
+//        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+//        {
+//            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+//            if (environment != EnvironmentName.Development)
+//            {
+//                optionsBuilder.UseSqlServer(Environment.GetEnvironmentVariable("DbConnectionString"));
+//            }
+//        }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -43,16 +52,6 @@ namespace iJoozEWallet.API.Persistence.Contexts
                 .HasMany(p => p.DeductHistories)
                 .WithOne(p => p.EWallet)
                 .HasForeignKey(p => p.UserId);
-
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            if (environment == EnvironmentName.Development)
-            {
-                builder.Entity<EWallet>().HasData
-                (
-                    new EWallet {UserId = "100", Balance = 100, LastUpdateDate = DateTime.Now},
-                    new EWallet {UserId = "101", Balance = 10, LastUpdateDate = DateTime.Now}
-                );
-            }
         }
 
         private void initialTopUpHistoryTable(ModelBuilder builder)

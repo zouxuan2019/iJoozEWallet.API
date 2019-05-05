@@ -31,14 +31,14 @@ namespace iJoozEWallet.API.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        public async Task<IEnumerable<EWalletResource>> GetAllAsync()
-        {
-            var eWalletBalances = await _eWalletService.ListAllAsync();
-            var resources = _mapper.Map<IEnumerable<EWallet>, IEnumerable<EWalletResource>>(eWalletBalances);
-
-            return resources;
-        }
+//        [HttpGet]
+//        public async Task<IEnumerable<EWalletResource>> GetAllAsync()
+//        {
+//            var eWalletBalances = await _eWalletService.ListAllAsync();
+//            var resources = _mapper.Map<IEnumerable<EWallet>, IEnumerable<EWalletResource>>(eWalletBalances);
+//
+//            return resources;
+//        }
 
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetAllTransactionByUserIdAsync([FromRoute] string userId)

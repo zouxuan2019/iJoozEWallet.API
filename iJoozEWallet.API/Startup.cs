@@ -39,21 +39,22 @@ namespace iJoozEWallet.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            CommonConfig(services);
+            byte[] signingKey = Convert.FromBase64String(Environment.GetEnvironmentVariable("SigningKey"));
+            var issuerSigningKey = new X509SecurityKey(new X509Certificate2(new X509Certificate(signingKey)));
+            CommonConfig(services, issuerSigningKey);
+
             services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString(Environment.GetEnvironmentVariable("DbConnectionString"))));
+                options.UseSqlServer(Environment.GetEnvironmentVariable("DbConnectionString")));
         }
 
-        public void ConfigureDevelopmentServices(IServiceCollection services)
+        private static void VerifyAuthentication(IServiceCollection services, X509SecurityKey issuerSigningKey)
         {
-            CommonConfig(services);
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = false,
                 ValidateIssuerSigningKey = true,
                 ValidateIssuer = false,
-                IssuerSigningKey = new X509SecurityKey(new X509Certificate2("ijooz.crt")),
+                IssuerSigningKey = issuerSigningKey
             };
             services.AddAuthentication()
                 .AddJwtBearer(options => { options.TokenValidationParameters = tokenValidationParameters; });
@@ -64,12 +65,18 @@ namespace iJoozEWallet.API
                         .RequireAuthenticatedUser()
                         .Build();
             });
+        }
+
+        public void ConfigureDevelopmentServices(IServiceCollection services)
+        {
+            var issuerSigningKey = new X509SecurityKey(new X509Certificate2("ijooz.crt"));
+            CommonConfig(services, issuerSigningKey);
 
             services.AddDbContext<AppDbContext>(options => { options.UseInMemoryDatabase("ijooz-db-in-memory"); });
         }
 
 
-        private static void CommonConfig(IServiceCollection services)
+        private static void CommonConfig(IServiceCollection services, X509SecurityKey issuerSigningKey)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
@@ -79,6 +86,7 @@ namespace iJoozEWallet.API
             services.AddAutoMapper();
 
             SwaggerConfig(services);
+            VerifyAuthentication(services, issuerSigningKey);
         }
 
         private static void SwaggerConfig(IServiceCollection services)
@@ -135,10 +143,7 @@ namespace iJoozEWallet.API
             app.UseHttpsRedirection();
             app.UseMvc();
             app.UseSwagger();
-            app.UseSwaggerUI(options =>
-            {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "EWallet API V1");
-            });
+            app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "EWallet API V1"); });
         }
     }
 }
