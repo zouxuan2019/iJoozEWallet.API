@@ -14,15 +14,6 @@ namespace iJoozEWallet.API.Persistence.Contexts
         {
         }
 
-//        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-//        {
-//            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-//            if (environment != EnvironmentName.Development)
-//            {
-//                optionsBuilder.UseSqlServer(Environment.GetEnvironmentVariable("DbConnectionString"));
-//            }
-//        }
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

@@ -45,6 +45,26 @@ namespace iJoozEWallet.API
                 options.UseSqlServer(Environment.GetEnvironmentVariable("DbConnectionString")));
         }
 
+        public void ConfigureDevelopmentServices(IServiceCollection services)
+        {
+            CommonConfig(services);
+            services.AddDbContext<AppDbContext>(options => { options.UseInMemoryDatabase("ijooz-db-in-memory"); });
+        }
+
+
+        private static void CommonConfig(IServiceCollection services)
+        {
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddScoped<IEWalletRepository, EWalletRepository>();
+            services.AddScoped<IEWalletService, EWalletService>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddAutoMapper();
+
+            SwaggerConfig(services);
+            VerifyAuthentication(services);
+        }
+
         private static void VerifyAuthentication(IServiceCollection services)
         {
             byte[] signingKey = Convert.FromBase64String(Environment.GetEnvironmentVariable("SigningKey"));
@@ -66,26 +86,6 @@ namespace iJoozEWallet.API
                         .RequireAuthenticatedUser()
                         .Build();
             });
-        }
-
-        public void ConfigureDevelopmentServices(IServiceCollection services)
-        {
-            CommonConfig(services);
-            services.AddDbContext<AppDbContext>(options => { options.UseInMemoryDatabase("ijooz-db-in-memory"); });
-        }
-
-
-        private static void CommonConfig(IServiceCollection services)
-        {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-            services.AddScoped<IEWalletRepository, EWalletRepository>();
-            services.AddScoped<IEWalletService, EWalletService>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddAutoMapper();
-
-            SwaggerConfig(services);
-            VerifyAuthentication(services);
         }
 
         private static void SwaggerConfig(IServiceCollection services)
