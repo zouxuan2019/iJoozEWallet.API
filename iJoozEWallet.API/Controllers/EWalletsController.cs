@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace iJoozEWallet.API.Controllers
 {
@@ -38,8 +39,10 @@ namespace iJoozEWallet.API.Controllers
 //
 //            return resources;
 //        }
-
+      
         [HttpGet("user/{userId}")]
+        [SwaggerOperation(Summary = "Get all transaction by user Id",
+            Description = "Returns all transaction histories including Top Up and Deduction")]
         public async Task<IActionResult> GetAllTransactionByUserIdAsync([FromRoute] string userId)
         {
             var eWallet = await _eWalletService.FindByUserIdAsync(userId);
@@ -55,6 +58,8 @@ namespace iJoozEWallet.API.Controllers
         }
 
         [HttpGet("transactionId/{transactionId}")]
+        [SwaggerOperation(Summary = "Get top up details by transaction Id",
+            Description = "Returns all information related to the Top Up transaction Id")]
         public async Task<IActionResult> GetTopUpTransactionAsync([FromRoute] string transactionId)
         {
             var topUpHistory = await _eWalletService.FindByTopUpTransactionIdAsync(transactionId);
@@ -70,6 +75,8 @@ namespace iJoozEWallet.API.Controllers
         }
 
         [HttpPost("saveTopUp")]
+        [SwaggerOperation(Summary = "Save Top Up",
+            Description = "Add current transaction amount to user account balance and save Top Up history")]
         public async Task<IActionResult> SaveTopUpAsync([FromBody] TopUpResource resource)
         {
             _logger.LogInformation("saveTopUp Request:" + JsonConvert.SerializeObject(resource));
@@ -93,6 +100,8 @@ namespace iJoozEWallet.API.Controllers
         }
 
         [HttpPost("saveDeduct")]
+        [SwaggerOperation(Summary = "Save Deduction",
+            Description = "Deduct current transaction amount to user account balance and save Deduction history")]
         public async Task<IActionResult> SaveDeductAsync([FromBody] DeductResource resource)
         {
             _logger.LogInformation("saveDeduct Request:" + JsonConvert.SerializeObject(resource));
