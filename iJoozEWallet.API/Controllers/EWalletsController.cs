@@ -39,20 +39,19 @@ namespace iJoozEWallet.API.Controllers
 //
 //            return resources;
 //        }
-      
+
         [HttpGet("user/{userId}")]
         [SwaggerOperation(Summary = "Get all transaction by user Id",
             Description = "Returns all transaction histories including Top Up and Deduction")]
         public async Task<IActionResult> GetAllTransactionByUserIdAsync([FromRoute] string userId)
         {
             var eWallet = await _eWalletService.FindByUserIdAsync(userId);
-
-            if (eWallet == null)
+            var eWalletResource = new EWalletResource {Balance = 0};
+            if (eWallet != null)
             {
-                return NotFound($"UserId: {userId} Not found");
+                eWalletResource = _mapper.Map<EWallet, EWalletResource>(eWallet);
             }
 
-            var eWalletResource = _mapper.Map<EWallet, EWalletResource>(eWallet);
 
             return Ok(eWalletResource);
         }
