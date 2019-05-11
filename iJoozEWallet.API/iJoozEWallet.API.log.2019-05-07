@@ -1,0 +1,19 @@
+2019-05-07 22:01:28,223  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request starting HTTP/1.1 GET https://localhost:5001/swagger/index.html  
+ 2019-05-07 22:01:28,529  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request finished in 315.4595ms 200 text/html;charset=utf-8
+ 2019-05-07 22:01:29,282  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request starting HTTP/1.1 GET https://localhost:5001/swagger/v1/swagger.json  
+ 2019-05-07 22:01:29,437 ERROR Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware.? [?] - MESSAGE: An unhandled exception has occurred while executing the request.
+ System.NotSupportedException: HTTP method "GET" & path "api/EWallets/transactionId/{transactionId}" overloaded by actions - iJoozEWallet.API.Controllers.EWalletsController.GetTopUpTransactionAsync (iJoozEWallet.API),iJoozEWallet.API.Controllers.EWalletsController.SaveTopUpAsync (iJoozEWallet.API). Actions require unique method/path combination for OpenAPI 3.0. Use ConflictingActionsResolver as a workaround
+   at Swashbuckle.AspNetCore.SwaggerGen.SwaggerGenerator.GenerateOperations(IEnumerable`1 apiDescriptions, SchemaRepository schemaRepository)
+   at Swashbuckle.AspNetCore.SwaggerGen.SwaggerGenerator.GeneratePaths(IEnumerable`1 apiDescriptions, SchemaRepository schemaRepository)
+   at Swashbuckle.AspNetCore.SwaggerGen.SwaggerGenerator.GetSwagger(String documentName, String host, String basePath)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Routing.EndpointRoutingMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware.Invoke(HttpContext context)
+2019-05-07 22:01:29,468  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request finished in 185.781ms 500 text/html; charset=utf-8
+ 2019-05-07 22:03:30,014  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request starting HTTP/1.1 GET https://localhost:5001/swagger/index.html  
+ 2019-05-07 22:03:30,265  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request finished in 256.8118ms 200 text/html;charset=utf-8
+ 2019-05-07 22:03:30,899  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request starting HTTP/1.1 GET https://localhost:5001/swagger/v1/swagger.json  
+ 2019-05-07 22:03:31,118  INFO Microsoft.AspNetCore.Hosting.Internal.WebHost.? [?] - MESSAGE: Request finished in 219.0453ms 200 application/json;charset=utf-8
+ 
