@@ -41,8 +41,8 @@ namespace iJoozEWallet.API.Controllers
 //        }
 
         [HttpGet("user/{userId}")]
-        [SwaggerOperation(Summary = "Get all transaction by user Id",
-            Description = "Returns all transaction histories including Top Up and Deduction")]
+        [SwaggerOperation(Summary = "Get balance and all transaction by user Id",
+            Description = "Returns balance and all transaction histories including Top Up and Deduction")]
         public async Task<IActionResult> GetAllTransactionByUserIdAsync([FromRoute] string userId)
         {
             var eWallet = await _eWalletService.FindByUserIdAsync(userId);
