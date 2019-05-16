@@ -97,6 +97,33 @@ namespace iJoozEWallet.API.Controllers
 
             return Ok(eWalletResource);
         }
+        
+        [HttpPost("updateTopUpStatus")]
+        [SwaggerOperation(Summary = "Update TopUp Transaction Status",
+            Description = "Update status after getting payment result")]
+        public async Task<IActionResult> UpdateTopUpStatus([FromBody] TransactionStatusResource resource)
+        {
+            _logger.LogInformation("updateTopUpStatus Request:" + JsonConvert.SerializeObject(resource));
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.GetErrorMessages());
+            }
+
+            var result = await _eWalletService.SaveTopUpTransactionStatus(resource);
+            if (!result.BaseResponse.Success)
+            {
+                return BadRequest(result.BaseResponse.Message);
+            }
+
+            var eWalletResource = _mapper.Map<EWallet, TopUpDeductionResource>(result.EWallet);
+            eWalletResource.TransactionId = resource.TransactionId;
+            _logger.LogInformation("updateTopUpStatus Response:" + JsonConvert.SerializeObject(eWalletResource));
+
+            return Ok(eWalletResource);
+        }
+
+        
 
         [HttpPost("saveDeduct")]
         [SwaggerOperation(Summary = "Save Deduction",

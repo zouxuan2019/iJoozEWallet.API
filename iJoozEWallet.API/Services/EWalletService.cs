@@ -59,6 +59,7 @@ namespace iJoozEWallet.API.Services
             try
             {
                 var eWallet = await GenerateEWalletByDeduct(deductResource);
+                await _unitOfWork.CompleteAsync();
                 return new SaveTransactionResponse(eWallet);
             }
             catch (Exception ex)
@@ -78,6 +79,52 @@ namespace iJoozEWallet.API.Services
         public async Task<IEnumerable<TopUpHistory>> FindByTopUpTransactionIdAsync(string transactionId)
         {
             return await _eWalletRepository.FindByTopUpTransactionIdAsync(transactionId);
+        }
+
+        public async Task<SaveTransactionResponse> SaveTopUpTransactionStatus(TransactionStatusResource resource)
+        {
+            try
+            {
+                var eWallet = await GenerateEWalletForTransactionStatusUpdate(resource);
+                await _unitOfWork.CompleteAsync();
+                return new SaveTransactionResponse(eWallet);
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = string.Format(Constants.TopUpWrapperErrMsg, ex.Message);
+                _logger.LogError(errorMessage);
+                return new SaveTransactionResponse(
+                    errorMessage);
+            }
+        }
+
+        private async Task<EWallet> GenerateEWalletForTransactionStatusUpdate(TransactionStatusResource resource)
+        {
+            var existingTopUpHistoryList = await FindByTopUpTransactionIdAsync(resource.TransactionId);
+            if (!existingTopUpHistoryList.Any())
+            {
+                var errorMessage = string.Format(Constants.TransactionIdNotExists, resource.TransactionId);
+                throw new Exception(errorMessage);
+            }
+
+            var existingTopUpHistory = existingTopUpHistoryList.OrderByDescending(p => p.ActionDate).FirstOrDefault();
+            var eWallet = await _eWalletRepository.FindByUserIdAsync(existingTopUpHistory.UserId);
+            if (ExistSuccessTopUpTransactionId(resource.TransactionId, eWallet.TopUpHistories))
+            {
+                return eWallet;
+            }
+
+            var topUpHistory = eWallet.TopUpHistories.OrderByDescending(p => p.ActionDate).FirstOrDefault();
+
+            eWallet.Balance += resource.Status == Status.Success ? existingTopUpHistory.Amount : 0;
+            eWallet.LastUpdateDate = resource.ActionDate;
+         
+            topUpHistory.Status = resource.Status;
+            topUpHistory.ActionDate = resource.ActionDate;
+
+            _eWalletRepository.AddOrUpdateEWallet(eWallet, false);
+
+            return eWallet;
         }
 
         private async Task<EWallet> GenerateEWalletByDeduct(DeductResource deductResource)

@@ -13,8 +13,6 @@ namespace iJoozEWallet.API.Resources
 
         public string Company { get; set; }
 
-        public Status Status { get; set; }
-
         public string Comment { get; set; }
 
         [Required] public string UserId { get; set; }

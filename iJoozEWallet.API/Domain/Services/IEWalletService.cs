@@ -16,5 +16,6 @@ namespace iJoozEWallet.API.Domain.Services
 
         Task<EWallet> FindByUserIdAsync(string userId);
         Task<IEnumerable<TopUpHistory>> FindByTopUpTransactionIdAsync(string transactionId);
+        Task<SaveTransactionResponse> SaveTopUpTransactionStatus(TransactionStatusResource resource);
     }
 }
