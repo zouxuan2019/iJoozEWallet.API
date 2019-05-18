@@ -97,8 +97,8 @@ namespace iJoozEWallet.API
                 c.SwaggerDoc("v1", new OpenApiInfo()
                 {
                     Version = "v1",
-                    Title = "EWallet API",
-                    Description = "EWallet API",
+                    Title = "E-Wallet API",
+                    Description = "E-Wallet API ",
                     Contact = new OpenApiContact {Name = "Zou Xuan", Email = "xuanozu89@gmail.com"}
                 });
                 var openApiSecurityScheme = new OpenApiSecurityScheme
