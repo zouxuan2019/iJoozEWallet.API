@@ -196,7 +196,7 @@ namespace iJoozEWallet.API.Test.Services
                 Times.Once);
             _testDataFixture.EWalletRepository.Verify(x => x.AddOrUpdateEWallet(It.IsAny<EWallet>(), false),
                 Times.Once);
-            _testDataFixture.UnitOfWork.Verify(x => x.CompleteAsync(), Times.Once);
+            _testDataFixture.UnitOfWork.Verify(x => x.CompleteAsync(), Times.Exactly(2));
         }
     }
 }
