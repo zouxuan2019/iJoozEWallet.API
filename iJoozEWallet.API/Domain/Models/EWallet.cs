@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace iJoozEWallet.API.Domain.Models
 {
     public class EWallet
     {
+        [StringLength(36)]
         public string UserId { get; set; }
         public double Balance { get; set; }
 
