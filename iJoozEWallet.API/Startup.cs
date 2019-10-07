@@ -48,6 +48,7 @@ namespace iJoozEWallet.API
 
         public void ConfigureDevelopmentServices(IServiceCollection services)
         {
+            
             CommonConfig(services);
             services.AddDbContext<AppDbContext>(options => { options.UseInMemoryDatabase("ijooz-db-in-memory"); });
         }
@@ -64,6 +65,14 @@ namespace iJoozEWallet.API
 
             SwaggerConfig(services);
             VerifyAuthentication(services);
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowMyOrigin",
+                    builder => builder
+                        .WithOrigins("https://fvmembership-ui.web.app", "https://localhost:8100")
+                        .AllowAnyHeader()
+                );
+            });
         }
 
         private static void VerifyAuthentication(IServiceCollection services)
@@ -130,6 +139,7 @@ namespace iJoozEWallet.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            app.UseCors("AllowMyOrigin");
             loggerFactory.AddLog4Net();
             if (env.IsDevelopment())
             {
