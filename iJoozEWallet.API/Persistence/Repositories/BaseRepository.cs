@@ -6,7 +6,7 @@ namespace iJoozEWallet.API.Persistence.Repositories
     {
         protected readonly AppDbContext _context;
 
-        public BaseRepository(AppDbContext context)
+        internal BaseRepository(AppDbContext context)
         {
             _context = context;
         }

@@ -138,7 +138,7 @@ namespace iJoozEWallet.API.Services
             if (ExistSuccessDeductTransactionId(deductResource.TransactionId, eWallet.DeductHistories))
             {
                 var errorMessage = string.Format(Constants.TransactionIdExistsErrMsg, deductResource.TransactionId);
-                SaveDeductHistory(deductResource, eWallet, Status.Fail, errorMessage);
+                await SaveDeductHistory(deductResource, eWallet, Status.Fail, errorMessage);
                 throw new Exception(errorMessage);
             }
 
@@ -146,7 +146,7 @@ namespace iJoozEWallet.API.Services
             {
                 var errorMessage = string.Format(Constants.BalanceLessThanDeductionErrMsg,
                     deductResource.TransactionId, eWallet.Balance, deductResource.Amount);
-                SaveDeductHistory(deductResource, eWallet, Status.Fail, errorMessage);
+               await SaveDeductHistory(deductResource, eWallet, Status.Fail, errorMessage);
                 throw new Exception(errorMessage);
             }
 
