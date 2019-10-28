@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
+using System.Data.Common;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using AutoMapper;
+using IdentityServer4.AccessTokenValidation;
 using iJoozEWallet.API.Domain.Repositories;
 using iJoozEWallet.API.Domain.Services;
-using iJoozEWallet.API.Persistence;
 using iJoozEWallet.API.Persistence.Contexts;
 using iJoozEWallet.API.Persistence.Repositories;
 using iJoozEWallet.API.Services;
@@ -16,7 +13,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,7 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-
+using MySql.Data.MySqlClient;
 
 namespace iJoozEWallet.API
 {
@@ -43,28 +39,34 @@ namespace iJoozEWallet.API
             CommonConfig(services);
 
             services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(Environment.GetEnvironmentVariable("DbConnectionString")));
+                options.UseMySql(Environment.GetEnvironmentVariable("DbConnectionString")));
         }
 
         public void ConfigureDevelopmentServices(IServiceCollection services)
         {
-            
             CommonConfig(services);
             services.AddDbContext<AppDbContext>(options => { options.UseInMemoryDatabase("ijooz-db-in-memory"); });
         }
 
 
-        private static void CommonConfig(IServiceCollection services)
+        private void CommonConfig(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddScoped<IEWalletRepository, EWalletRepository>();
             services.AddScoped<IEWalletService, EWalletService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<TokenService, TokenService>();
+
             services.AddAutoMapper();
 
             SwaggerConfig(services);
-            VerifyAuthentication(services);
+            VerifyAuthenticationWithAuthServer(services);
+            AddCorsPolicy(services);
+        }
+
+        private static void AddCorsPolicy(IServiceCollection services)
+        {
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowMyOrigin",
@@ -75,7 +77,7 @@ namespace iJoozEWallet.API
             });
         }
 
-        private static void VerifyAuthentication(IServiceCollection services)
+        private static void VerifyAuthenticationLocally(IServiceCollection services)
         {
             byte[] signingKey = Convert.FromBase64String(Environment.GetEnvironmentVariable("SigningKey"));
             var issuerSigningKey = new X509SecurityKey(new X509Certificate2(new X509Certificate(signingKey)));
@@ -98,6 +100,20 @@ namespace iJoozEWallet.API
             });
         }
 
+        private void VerifyAuthenticationWithAuthServer(IServiceCollection services)
+        {
+            services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
+                .AddIdentityServerAuthentication(options =>
+                {
+                    options.Authority = Configuration["AuthHost"];
+                    options.ApiName = "FvMembership";
+                    options.RequireHttpsMetadata = false;
+                    options.EnableCaching = true;
+                    options.CacheDuration = TimeSpan.FromMinutes(10);
+                })
+                ;
+        }
+
         private static void SwaggerConfig(IServiceCollection services)
         {
             services.AddSwaggerGen(c =>
@@ -115,7 +131,7 @@ namespace iJoozEWallet.API
                     In = ParameterLocation.Header,
                     Description = "Please enter into field the word 'Bearer' following by space and JWT",
                     Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
+                    Type = SecuritySchemeType.ApiKey
                 };
                 c.AddSecurityDefinition("Bearer", openApiSecurityScheme);
 

@@ -21,6 +21,7 @@ namespace iJoozEWallet.API.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
+
         public EWalletService(ILogger<EWalletService> logger, IEWalletRepository eWalletRepository,
             IUnitOfWork unitOfWork,
             IMapper mapper
@@ -37,11 +38,11 @@ namespace iJoozEWallet.API.Services
             return await _eWalletRepository.ListAllAsync();
         }
 
-        public async Task<SaveTransactionResponse> SaveTopUpAsync(TopUpResource topUpResource)
+        public async Task<SaveTransactionResponse> SaveTopUpAsync(TopUpResource topUpResource, string userId)
         {
             try
             {
-                var eWallet = await GenerateEWalletByTopUp(topUpResource);
+                var eWallet = await GenerateEWalletByTopUp(topUpResource, userId);
                 await _unitOfWork.CompleteAsync();
                 return new SaveTransactionResponse(eWallet);
             }
@@ -54,11 +55,11 @@ namespace iJoozEWallet.API.Services
             }
         }
 
-        public async Task<SaveTransactionResponse> SaveDeductAsync(DeductResource deductResource)
+        public async Task<SaveTransactionResponse> SaveDeductAsync(DeductResource deductResource, string userId)
         {
             try
             {
-                var eWallet = await GenerateEWalletByDeduct(deductResource);
+                var eWallet = await GenerateEWalletByDeduct(deductResource, userId);
                 await _unitOfWork.CompleteAsync();
                 return new SaveTransactionResponse(eWallet);
             }
@@ -118,7 +119,7 @@ namespace iJoozEWallet.API.Services
 
             eWallet.Balance += resource.Status == Status.Success ? existingTopUpHistory.Amount : 0;
             eWallet.LastUpdateDate = resource.ActionDate;
-         
+
             topUpHistory.Status = resource.Status;
             topUpHistory.ActionDate = resource.ActionDate;
 
@@ -127,12 +128,12 @@ namespace iJoozEWallet.API.Services
             return eWallet;
         }
 
-        private async Task<EWallet> GenerateEWalletByDeduct(DeductResource deductResource)
+        private async Task<EWallet> GenerateEWalletByDeduct(DeductResource deductResource, string userId)
         {
-            var eWallet = await _eWalletRepository.FindByUserIdAsync(deductResource.UserId);
+            var eWallet = await _eWalletRepository.FindByUserIdAsync(userId);
             if (eWallet == null)
             {
-                throw new Exception(string.Format(Constants.DeductUserNotExistsErrMsg, deductResource.UserId));
+                throw new Exception(string.Format(Constants.DeductUserNotExistsErrMsg, userId));
             }
 
             if (ExistSuccessDeductTransactionId(deductResource.TransactionId, eWallet.DeductHistories))
@@ -146,7 +147,7 @@ namespace iJoozEWallet.API.Services
             {
                 var errorMessage = string.Format(Constants.BalanceLessThanDeductionErrMsg,
                     deductResource.TransactionId, eWallet.Balance, deductResource.Amount);
-               await SaveDeductHistory(deductResource, eWallet, Status.Fail, errorMessage);
+                await SaveDeductHistory(deductResource, eWallet, Status.Fail, errorMessage);
                 throw new Exception(errorMessage);
             }
 
@@ -169,15 +170,15 @@ namespace iJoozEWallet.API.Services
             return eWallet;
         }
 
-        private async Task<EWallet> GenerateEWalletByTopUp(TopUpResource topUpResource)
+        private async Task<EWallet> GenerateEWalletByTopUp(TopUpResource topUpResource, string userId)
         {
-            var eWallet = await _eWalletRepository.FindByUserIdAsync(topUpResource.UserId);
+            var eWallet = await _eWalletRepository.FindByUserIdAsync(userId);
             var isAddNewEWallet = false;
             if (eWallet == null)
             {
                 eWallet = new EWallet
                 {
-                    UserId = topUpResource.UserId,
+                    UserId = userId,
                     Balance = topUpResource.Status == Status.Success ? topUpResource.Amount : 0,
                     TopUpHistories = new List<TopUpHistory>()
                 };
@@ -195,6 +196,7 @@ namespace iJoozEWallet.API.Services
             }
 
             var topUpHistory = _mapper.Map<TopUpResource, TopUpHistory>(topUpResource);
+            topUpHistory.UserId = userId;
             eWallet.TopUpHistories.Add(topUpHistory);
             eWallet.LastUpdateDate = topUpHistory.ActionDate;
             _eWalletRepository.AddOrUpdateEWallet(eWallet, isAddNewEWallet);

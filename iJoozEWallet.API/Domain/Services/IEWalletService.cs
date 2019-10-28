@@ -10,9 +10,9 @@ namespace iJoozEWallet.API.Domain.Services
     {
         Task<IEnumerable<EWallet>> ListAllAsync();
 
-        Task<SaveTransactionResponse> SaveTopUpAsync(TopUpResource topUpResource);
+        Task<SaveTransactionResponse> SaveTopUpAsync(TopUpResource topUpResource, string userId);
 
-        Task<SaveTransactionResponse> SaveDeductAsync(DeductResource deductResource);
+        Task<SaveTransactionResponse> SaveDeductAsync(DeductResource deductResource, string userId);
 
         Task<EWallet> FindByUserIdAsync(string userId);
         Task<IEnumerable<TopUpHistory>> FindByTopUpTransactionIdAsync(string transactionId);

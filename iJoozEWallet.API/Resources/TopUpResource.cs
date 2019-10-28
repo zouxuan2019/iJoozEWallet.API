@@ -16,7 +16,7 @@ namespace iJoozEWallet.API.Resources
         
         [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime ActionDate { get; set; }
-
-        [Required] public string UserId { get; set; }
+        
+        
     }
 }

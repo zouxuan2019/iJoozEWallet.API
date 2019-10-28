@@ -27,25 +27,20 @@ namespace iJoozEWallet.API.Controllers
         }
 
         [HttpPost("callback")]
-        public async void ProcessPaymentCallback([FromForm] FomoPayResponse fomoPayResponse)
+        public void ProcessPaymentCallback([FromForm] FomoPayResponse fomoPayResponse)
         {
             _logger.LogInformation("processPaymentCallback Request:" + JsonConvert.SerializeObject(fomoPayResponse));
             if (!IsSignatureValid(fomoPayResponse)) return;
-
-            var resource = await ConvertFomoPayResponseToTopUpResource(fomoPayResponse);
-            if (resource != null)
-            {
-                await _eWalletService.SaveTopUpAsync(resource);
-            }
+            SaveFomoPayResponse(fomoPayResponse).GetAwaiter().GetResult();
         }
 
-        private async Task<TopUpResource> ConvertFomoPayResponseToTopUpResource(FomoPayResponse fomoPayResponse)
+        private async Task SaveFomoPayResponse(FomoPayResponse fomoPayResponse)
         {
             var topUpHistory = await _eWalletService.FindByTopUpTransactionIdAsync(fomoPayResponse.transaction);
             var initTransaction = topUpHistory.First(x => x.Status == Status.Init);
             if (initTransaction != null)
             {
-                return new TopUpResource
+                TopUpResource topUpResource = new TopUpResource
                 {
                     TransactionId = fomoPayResponse.transaction,
                     ActionDate = DateTime.Now,
@@ -53,13 +48,11 @@ namespace iJoozEWallet.API.Controllers
                     PaymentReferenceNo = fomoPayResponse.payment_id + '|' + fomoPayResponse.upstream + '|' +
                                          fomoPayResponse.nonce + '|' +
                                          fomoPayResponse.signature,
-                    UserId = initTransaction.UserId,
                     Amount = initTransaction.Amount,
                     PaymentMerchant = initTransaction.PaymentMerchant
                 };
+                await _eWalletService.SaveTopUpAsync(topUpResource, initTransaction.UserId);
             }
-
-            return null;
         }
 
         private static string ComputeSha256Hash(string rawData)
