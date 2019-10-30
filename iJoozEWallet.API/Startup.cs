@@ -39,8 +39,22 @@ namespace iJoozEWallet.API
             CommonConfig(services);
 
             services.AddDbContext<AppDbContext>(options =>
-                options.UseMySql(Environment.GetEnvironmentVariable("DbConnectionString")));
+                options.UseMySql(GetDbConnection().ConnectionString));
         }
+
+        DbConnection GetDbConnection()
+        {
+            var connectionString = new MySqlConnectionStringBuilder(
+                Environment.GetEnvironmentVariable("DbConnectionString"))
+            {
+                // Connecting to a local proxy that does not support ssl.
+                SslMode = MySqlSslMode.None,
+            };
+            DbConnection connection = new MySqlConnection(connectionString.ConnectionString);
+
+            return connection;
+        }
+
 
         public void ConfigureDevelopmentServices(IServiceCollection services)
         {

@@ -7,6 +7,7 @@ using iJoozEWallet.API.Domain.Services;
 using iJoozEWallet.API.Resources;
 using iJoozEWallet.API.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -19,11 +20,14 @@ namespace iJoozEWallet.API.Controllers
     {
         private readonly IEWalletService _eWalletService;
         private readonly ILogger _logger;
+        private readonly IConfiguration _configuration;
 
-        public PaymentController(ILoggerFactory depLoggerFactory, IEWalletService eWalletService)
+        public PaymentController(ILoggerFactory depLoggerFactory, IEWalletService eWalletService,
+            IConfiguration configuration)
         {
             _logger = depLoggerFactory.CreateLogger("Controllers.PaymentController");
             _eWalletService = eWalletService;
+            _configuration = configuration;
         }
 
         [HttpPost("callback")]
@@ -32,6 +36,40 @@ namespace iJoozEWallet.API.Controllers
             _logger.LogInformation("processPaymentCallback Request:" + JsonConvert.SerializeObject(fomoPayResponse));
             if (!IsSignatureValid(fomoPayResponse)) return;
             SaveFomoPayResponse(fomoPayResponse).GetAwaiter().GetResult();
+        }
+
+        [HttpPost("signature")]
+        public IActionResult GenerateSignature([FromBody] FomoPaySignatureParam fomoPayParam)
+        {
+            _logger.LogInformation("GenerateSignature Request:" + JsonConvert.SerializeObject(fomoPayParam));
+            string queryString = Param(fomoPayParam) + "&shared_key=" + _configuration["FomoPayment:apiKey"];
+            return Ok(new {singature = ComputeSha256Hash(queryString)});
+        }
+
+        private string Param(FomoPaySignatureParam fomo)
+        {
+            SortedDictionary<string, string> param = new SortedDictionary<string, string>();
+            param.Add("merchant", fomo.merchant);
+            param.Add("price", fomo.amount);
+            param.Add("description", fomo.description);
+            param.Add("transaction", fomo.transaction);
+            param.Add("return_url", fomo.returnUrl);
+            param.Add("callback_url", fomo.callbackUrl);
+            param.Add("currency_code", fomo.currencyCode);
+            param.Add("type", fomo.type);
+            param.Add("timeout", fomo.timeout);
+            param.Add("nonce", fomo.nonce);
+
+            StringBuilder strArray = new StringBuilder();
+            foreach (KeyValuePair<string, string> temp in param)
+            {
+                strArray.Append(temp.Key + "=" + temp.Value + "&");
+            }
+
+            int nLen = strArray.Length;
+            strArray.Remove(nLen - 1, 1);
+
+            return strArray.ToString();
         }
 
         private async Task SaveFomoPayResponse(FomoPayResponse fomoPayResponse)
@@ -102,5 +140,19 @@ namespace iJoozEWallet.API.Controllers
         public string nonce { get; set; }
         public string payment_id { get; set; }
         public string signature { get; set; }
+    }
+
+    public class FomoPaySignatureParam
+    {
+        public string callbackUrl { get; set; }
+        public string currencyCode { get; set; }
+        public string description { get; set; }
+        public string merchant { get; set; }
+        public string nonce { get; set; }
+        public string amount { get; set; }
+        public string returnUrl { get; set; }
+        public string timeout { get; set; }
+        public string transaction { get; set; }
+        public string type { get; set; }
     }
 }

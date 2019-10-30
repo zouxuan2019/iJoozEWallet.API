@@ -9,7 +9,6 @@ using iJoozEWallet.API.Resources;
 using iJoozEWallet.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
@@ -25,6 +24,7 @@ namespace iJoozEWallet.API.Controllers
         private readonly IEWalletService _eWalletService;
         private readonly IMapper _mapper;
         private readonly TokenService _tokenService;
+
 
         public EWalletsController(ILoggerFactory depLoggerFactory,
             IEWalletService eWalletService,
@@ -49,10 +49,10 @@ namespace iJoozEWallet.API.Controllers
         [HttpGet("transaction/currentUser")]
         [SwaggerOperation(Summary = "Get balance and all transaction by user Id",
             Description = "Returns balance and all transaction histories including Top Up and Deduction")]
-        public async Task<IActionResult> GetAllTransactionByUserIdAsync()
+        public IActionResult GetAllTransactionByUserIdAsync()
         {
             var userId = getUserIdFromAuthHeader();
-            var eWallet = await _eWalletService.FindByUserIdAsync(userId);
+            var eWallet = _eWalletService.FindByUserIdAsync(userId).GetAwaiter().GetResult();
             var eWalletResource = new EWalletResource {Balance = 0};
             if (eWallet != null)
             {
@@ -66,9 +66,9 @@ namespace iJoozEWallet.API.Controllers
         [HttpGet("transactionId/{transactionId}")]
         [SwaggerOperation(Summary = "Get top up details by transaction Id",
             Description = "Returns all information related to the Top Up transaction Id")]
-        public async Task<IActionResult> GetTopUpTransactionAsync([FromRoute] string transactionId)
+        public IActionResult GetTopUpTransactionAsync([FromRoute] string transactionId)
         {
-            var topUpHistory = await _eWalletService.FindByTopUpTransactionIdAsync(transactionId);
+            var topUpHistory = _eWalletService.FindByTopUpTransactionIdAsync(transactionId).GetAwaiter().GetResult();
 
             if (topUpHistory == null)
             {
@@ -83,27 +83,36 @@ namespace iJoozEWallet.API.Controllers
         [HttpPost("saveTopUp")]
         [SwaggerOperation(Summary = "Save Top Up",
             Description = "Add current transaction amount to user account balance and save Top Up history")]
-        public async Task<IActionResult> SaveTopUpAsync([FromBody] TopUpResource resource)
+        public IActionResult SaveTopUpAsync([FromBody] TopUpResource resource)
         {
-            var userId = getUserIdFromAuthHeader();
-            _logger.LogInformation("saveTopUp Request:" + JsonConvert.SerializeObject(resource));
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState.GetErrorMessages());
-            }
+                var userId = getUserIdFromAuthHeader();
+                _logger.LogInformation("saveTopUp Request:" + JsonConvert.SerializeObject(resource));
 
-            var result = await _eWalletService.SaveTopUpAsync(resource, userId);
-            if (!result.BaseResponse.Success)
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState.GetErrorMessages());
+                }
+
+                var result = _eWalletService.SaveTopUpAsync(resource, userId).GetAwaiter().GetResult();
+                if (!result.BaseResponse.Success)
+                {
+                    return BadRequest(result.BaseResponse.Message);
+                }
+
+                var eWalletResource = _mapper.Map<EWallet, TopUpDeductionResource>(result.EWallet);
+                eWalletResource.TransactionId = resource.TransactionId;
+                _logger.LogInformation("saveTopUp Response:" + JsonConvert.SerializeObject(eWalletResource));
+
+                return Ok(eWalletResource);
+            }
+            catch (Exception e)
             {
-                return BadRequest(result.BaseResponse.Message);
+                Console.WriteLine(e.StackTrace);
+                Console.WriteLine(e);
+                throw;
             }
-
-            var eWalletResource = _mapper.Map<EWallet, TopUpDeductionResource>(result.EWallet);
-            eWalletResource.TransactionId = resource.TransactionId;
-            _logger.LogInformation("saveTopUp Response:" + JsonConvert.SerializeObject(eWalletResource));
-
-            return Ok(eWalletResource);
         }
 
         private string getUserIdFromAuthHeader()
@@ -117,7 +126,7 @@ namespace iJoozEWallet.API.Controllers
         [HttpPost("updateTopUpStatus")]
         [SwaggerOperation(Summary = "Update TopUp Transaction Status",
             Description = "Update status after getting payment result")]
-        public async Task<IActionResult> UpdateTopUpStatus([FromBody] TransactionStatusResource resource)
+        public IActionResult UpdateTopUpStatus([FromBody] TransactionStatusResource resource)
         {
             _logger.LogInformation("updateTopUpStatus Request:" + JsonConvert.SerializeObject(resource));
 
@@ -126,7 +135,7 @@ namespace iJoozEWallet.API.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
 
-            var result = await _eWalletService.SaveTopUpTransactionStatus(resource);
+            var result = _eWalletService.SaveTopUpTransactionStatus(resource).GetAwaiter().GetResult();
             if (!result.BaseResponse.Success)
             {
                 return BadRequest(result.BaseResponse.Message);
@@ -152,7 +161,7 @@ namespace iJoozEWallet.API.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
 
-            var result = await _eWalletService.SaveDeductAsync(resource,userId);
+            var result = await _eWalletService.SaveDeductAsync(resource, userId);
             if (!result.BaseResponse.Success)
             {
                 return BadRequest(result.BaseResponse.Message);
