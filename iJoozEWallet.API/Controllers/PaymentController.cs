@@ -43,7 +43,7 @@ namespace iJoozEWallet.API.Controllers
         {
             _logger.LogInformation("GenerateSignature Request:" + JsonConvert.SerializeObject(fomoPayParam));
             string queryString = Param(fomoPayParam) + "&shared_key=" + _configuration["FomoPayment:apiKey"];
-            return Ok(new {singature = ComputeSha256Hash(queryString)});
+            return Ok(new {signature = ComputeSha256Hash(queryString)});
         }
 
         private string Param(FomoPaySignatureParam fomo)
